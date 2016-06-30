@@ -8,7 +8,7 @@ defmodule Metex.Worker do
   end
 
   def get_temperature(pid, location) do
-    Genserver.call(pid, {:location, location})
+    GenServer.call(pid, {:location, location})
   end
 
 
@@ -60,6 +60,15 @@ defmodule Metex.Worker do
 
   defp apikey do
     Application.get_env(:metex, :ow)
+  end
+
+  defp update_stats(old_stats, location) do
+    case Map.has_key?(old_stats, location) do
+      true ->
+        Map.update!(old_stats, location, &(&1 + 1))
+      false ->
+        Map.put_new(old_stats, location, 1)
+    end
   end
 
 end
