@@ -26,7 +26,11 @@ defmodule Cache do
   end
 
   def exist?(key) do
-    GenServer.call(@name, key)
+    GenServer.call(@name, {:exist, key})
+  end
+
+  def show do
+    GenServer.call(@name, :show)
   end
 
   def stop do
@@ -65,12 +69,34 @@ defmodule Cache do
     end
   end
 
+  def handle_call(:show, _from, cache) do
+    {:reply, cache, cache}
+  end
+
+  def handle_call({:exist, key}, _from, cache) do
+    case Map.has_key?(cache, key) do
+      true ->
+        {:reply, true, cache}
+      false ->
+        {:reply, false, cache}
+    end
+  end
+
   def handle_cast({:write, {key, value}}, cache) do
     new_cache = update_cache(cache, key, value)
     {:noreply, new_cache}
   end
 
-  def handle_cast(:reset_stats, _stats) do
+  def handle_cast({:delete, key}, cache) do
+    case Map.has_key?(cache, key) do
+      true ->
+        {:noreply, Map.delete(cache, key), cache}
+      false ->
+        {:noreply, :error, cache}
+    end
+  end
+
+  def handle_cast(:clear, _cache) do
     {:noreply, %{}}
   end
 
@@ -99,4 +125,17 @@ end
 {:ok, pid} = Cache.start_link
 Cache.write(:stooges, ["Larry", "Moe", "Curly"])
 IO.inspect Cache.read(:stooges)
+Cache.write(:test, "hello")
+IO.inspect Cache.read(:test)
+IO.inspect Cache.show
+Cache.delete(:test)
+IO.inspect Cache.read(:test)
+IO.inspect Cache.show
+Cache.clear
+IO.inspect Cache.show
+
+Cache.write(:test, "hello")
+IO.inspect Cache.exist?(:test)
+Cache.clear
+IO.inspect Cache.exist?(:test)
 
