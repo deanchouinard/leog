@@ -11,6 +11,10 @@ defmodule ThySupervisor do
     GenServer.call(supervisor, {:start_child, child_spec})
   end
 
+  def terminate_child(supervisor, pid) do
+    GenServer.call(supervisor, {:terminate_child, pid})
+  end
+
   # Callbacks
 
   def init([child_spec_list]) do
@@ -30,6 +34,22 @@ defmodule ThySupervisor do
       :error ->
         {:reply, {:error, "error starting child"}, state}
     end
+  end
+
+  def handle_call({:terminate_child, pid}, _from, state) do
+    case terminate_child(pid) do
+      :ok ->
+        new_state = state |> HashDict.delete(pid)
+        {:reply, :ok, new_state}
+      :error ->
+        {:reply, {:error, "error terminating child"}, state}
+    end
+  end
+
+  def handle_info({:EXIT, from, :killed}, state) do
+    IO.puts "handle info EXIT"
+    new_state = state |> HashDict.delete(from)
+    {:noreply, new_state}
   end
 
   # Private Functions
@@ -53,6 +73,11 @@ defmodule ThySupervisor do
       _ ->
         :error
     end
+  end
+
+  def terminate_child(pid) do
+    Process.exit(pid, :kill)
+    :ok
   end
 
 end
