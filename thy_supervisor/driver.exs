@@ -11,3 +11,15 @@ ThySupervisor.terminate_child(child_pid)
 :timer.sleep(500)
 IO.inspect Process.info(sup_pid, :links)
 
+IO.puts "\n### Restart Child"
+{:ok, child_pid} = ThySupervisor.start_child(sup_pid, {ThyWorker, :start_link,
+  []})
+IO.puts "Child pid: #{inspect child_pid}"
+:timer.sleep(500)
+IO.inspect Process.info(sup_pid, :links)
+ThySupervisor.restart_child(sup_pid, child_pid, {ThyWorker, :start_link, []})
+:timer.sleep(500)
+IO.inspect Process.info(sup_pid, :links)
+
+
+
