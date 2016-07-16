@@ -21,5 +21,6 @@ ThySupervisor.restart_child(sup_pid, child_pid, {ThyWorker, :start_link, []})
 :timer.sleep(500)
 IO.inspect Process.info(sup_pid, :links)
 
-
+IO.puts "Count children: #{inspect ThySupervisor.count_children(sup_pid)}"
+IO.puts "Which children: #{inspect ThySupervisor.which_children(sup_pid)}"
 
