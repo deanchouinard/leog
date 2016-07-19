@@ -118,7 +118,7 @@ defmodule ThySupervisor do
 
   # Private Functions
 
-  def start_children([child_spec|rest]) do
+  defp start_children([child_spec|rest]) do
     case start_child(child_spec) do
       {:ok, pid} ->
         [{pid, child_spec}|start_children(rest)]
@@ -127,19 +127,20 @@ defmodule ThySupervisor do
     end
   end
 
-  def start_children([]), do: []
+  defp start_children([]), do: []
 
 
-  def start_child({mod, fun, args}) do
+  defp start_child({mod, fun, args}) do
     case apply(mod, fun, args) do
       pid when is_pid(pid) ->
+        Process.link(pid)
         {:ok, pid}
       _ ->
         :error
     end
   end
 
-  def restart_child(pid, child_spec) when is_pid(pid) do
+  defp restart_child(pid, child_spec) when is_pid(pid) do
     case terminate_child(pid) do
       :ok ->
         case start_child(child_spec) do
@@ -153,15 +154,15 @@ defmodule ThySupervisor do
     end
   end
 
-  def terminate_children([]) do
+  defp terminate_children([]) do
     :ok
   end
 
-  def terminate_children(child_specs) do
+  defp terminate_children(child_specs) do
     child_specs |> Enum.each(fn {pid, _} -> terminate_child(pid) end)
   end
 
-  def terminate_child(pid) do
+  defp terminate_child(pid) do
     Process.exit(pid, :kill)
     :ok
   end

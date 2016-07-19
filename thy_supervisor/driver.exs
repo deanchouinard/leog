@@ -7,7 +7,7 @@ IO.inspect Process.info(sup_pid, :links)
 
 IO.puts "self: #{inspect self}"
 
-ThySupervisor.terminate_child(child_pid)
+ThySupervisor.terminate_child(sup_pid, child_pid)
 :timer.sleep(500)
 IO.inspect Process.info(sup_pid, :links)
 

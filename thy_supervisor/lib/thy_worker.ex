@@ -1,6 +1,7 @@
 defmodule ThyWorker do
   def start_link do
-    spawn_link(fn -> loop end)
+    #spawn_link(fn -> loop end)
+    spawn(fn -> loop end)
   end
 
   def loop do
