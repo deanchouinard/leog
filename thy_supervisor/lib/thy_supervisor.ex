@@ -84,7 +84,6 @@ defmodule ThySupervisor do
   end
 
   def handle_info({:EXIT, from, :killed}, state) do
-    IO.puts "handle info EXIT"
     new_state = state |> HashDict.delete(from)
     {:noreply, new_state}
   end
