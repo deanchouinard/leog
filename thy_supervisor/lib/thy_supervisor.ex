@@ -15,7 +15,7 @@ defmodule ThySupervisor do
     GenServer.call(supervisor, {:terminate_child, pid})
   end
 
-  def restart_child(supervisor, pid, child_spec) when is_pid(pid) do
+  def restart_child(supervisor, pid, _child_spec) when is_pid(pid) do
     GenServer.call(supervisor, {:restart_child, pid})
   end
 
